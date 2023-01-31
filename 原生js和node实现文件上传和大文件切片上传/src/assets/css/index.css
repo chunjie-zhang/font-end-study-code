@@ -37,6 +37,7 @@
   height: 3px;
   border-radius: 3px;
   background-color: green;
+  transition: width .5s;
 }
 
 button {
@@ -122,4 +123,10 @@ li em {
   font-size: 12px;
   background-repeat: no-repeat;
   background-size: contain;
+}
+.upload_abber img {
+  display: none;
+  margin-top: 16px;
+  width: 60px;
+  height: 60px;
 }

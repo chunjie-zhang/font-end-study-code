@@ -2,7 +2,7 @@
  * @Author: zhangchunjie8 zhangchunjie8@jd.com
  * @Date: 2023-01-29 15:13:13
  * @LastEditors: zhangchunjie8 zhangchunjie8@jd.com
- * @LastEditTime: 2023-01-31 10:42:18
+ * @LastEditTime: 2023-01-31 17:16:36
  */
 
 const multiparty = require('multiparty'),
@@ -57,14 +57,14 @@ const exists = function (path) {
 const writeFile = function (res, path, file, filename, stream) {
   return new Promise((resolve, reject) => {
     if (stream) {
-
+      // path = file.path;
     }
     fs.writeFile(path, file, err => {
       if (err) {
         reject(err);
         res.send({
           code: 400,
-          msg: "文件写入失败",
+          msg: "文件上传失败",
         });
         return;
       };
@@ -136,7 +136,7 @@ module.exports = class Controller {
   };
 
   /**
-   * 单一文件上传 [BASE64]
+   * 单一文件上传 [BASE64] 处理文件名称，也做文件名的匹配去重处理
    * @param {*} req 
    * @param {*} res 
    */
@@ -166,7 +166,7 @@ module.exports = class Controller {
 
       if (isExists) {
         res.send({
-          code: 201,
+          code: 200,
           msg: "文件已经存在",
           originalFilename: filename,
           servicePath: path.replace(__dirname, HOSTNAME),
@@ -176,11 +176,48 @@ module.exports = class Controller {
       // 写入文件
       writeFile(res, path, file, filename, file);
     } catch (error) {
-      console.log(error);
       res.send({
-        code: 400,
+        code: 404,
         msg: "服务器内部错误",
       });
     }
-  }
-}
+  };
+
+  /**
+   * 单一文件上传 [缩略图]， 不处理文件名称由前端传，也做文件名的匹配去重处理
+   * @param {*} req 
+   * @param {*} res 
+   */
+  async uploadSingleName (req, res) {
+    try {
+      let { fields, files } = await multipartyUpload(req);
+      let filename = (fields.filename && fields.filename[0]) || '',
+          file = (files.file && files.file[0]) || {},
+          path = uploadDir + '/' + filename,
+          isExists = false;
+      
+      // 检测是否存在
+      isExists = await exists(path);
+
+      if (isExists) {
+        res.send({
+          code: 200,
+          msg: '文件已经存在',
+          originalFilename: filename,
+          servicePath: path.replace(__dirname, HOSTNAME),
+        });
+        return;
+      }
+
+      writeFile(res, path, file, filename, true);
+
+    } catch (error) {
+      console.log(error);
+      res.send({
+        code: 404,
+        msg: "服务器内部错误",
+      });
+    };
+  };
+  
+};
