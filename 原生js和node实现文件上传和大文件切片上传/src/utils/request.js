@@ -2,7 +2,7 @@
  * @Author: zhangchunjie8 zhangchunjie8@jd.com
  * @Date: 2023-01-28 11:15:35
  * @LastEditors: zhangchunjie8 zhangchunjie8@jd.com
- * @LastEditTime: 2023-01-28 18:33:39
+ * @LastEditTime: 2023-01-31 10:33:33
  */
 
 let instance = axios.create();
@@ -19,7 +19,10 @@ instance.defaults.headers['Content-Type'] = 'multipart/form-data';
  */
 instance.defaults.transformRequest = (data, headers) => {
   const contentType = headers['Content-Type'];
-  if (contentType === CONFIG_ENUM.content_type_urlencoded) qs.stringify(data);
+
+  if (contentType === CONFIG_ENUM.content_type_urlencoded) {
+    return Qs.stringify(data)
+  };
 
   return data;
 }
