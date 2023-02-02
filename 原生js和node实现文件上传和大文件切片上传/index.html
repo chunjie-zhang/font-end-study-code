@@ -76,7 +76,7 @@
     <div class="item">
       <h3>多文件上传 [FORM-DATA]</h3>
       <section id="upload5">
-        <input type="file" accept=".png,.jpg" multiple class="upload_ipt" style="display: none" />
+        <input type="file" multiple class="upload_ipt" style="display: none" />
         <!-- 自己文件的按钮,来触发选择图片 -->
         <div class="upload_button_block">
           <button class="upload_button select">选择文件</button>
@@ -118,12 +118,15 @@
   <script src="node_modules/spark-md5/spark-md5.min.js"></script>
   <script src="./src/config//index.js"></script>
   <script src="./src/utils/request.js"></script>
+  <script src="./src/utils/index.js"></script>
+  
   <!--文件上传核心代码-->
   <script src="./src/js/uploadSingle.js"></script>
   <script src="./src//js/uploadSingleBase64.js"></script>
   <script src="./src//js//uploadSingleName.js"></script>
   <script src="./src//js//uploadProcess.js"></script>
-  <script src="./src/js/upload.js"></script>
+  <script src="./src/js/uploadMultiparty.js"></script>
+  <script src="./src//js//uploadDrag.js"></script>
 </body>
 
 </html>

@@ -10,7 +10,7 @@
   margin-right: 20px;
   margin-bottom: 20px;
   padding: 10px;
-  width: 300px;
+  min-width: 300px;
   min-height: 200px;
   border: 1px dashed #ccc;
   box-sizing: border-box;
@@ -75,11 +75,11 @@ a {
 li {
   list-style: none;
 }
-li em:hover {
+li span:nth-last-child(1):hover {
   color: #7395fc;
 }
 
-li em {
+li span:nth-last-child(1) {
   color: #3768FA;
   cursor: pointer;
 }

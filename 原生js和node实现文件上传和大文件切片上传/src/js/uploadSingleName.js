@@ -118,7 +118,7 @@ const uploadSingleName = function () {
   upload_button_upload.addEventListener('click', async function () {
     if (upload_button_select.classList.contains('disabled') || upload_button_upload.classList.contains('loading')) return;
 
-    if(!_file) {
+    if (!_file) {
       alert('请先选择文件进行上传~');
       return;
     }
@@ -127,7 +127,6 @@ const uploadSingleName = function () {
 
     // 生成文件的hash名
     const bufferObj = await changeBuffer(_file);
-    console.log(bufferObj.filename)
 
     let formData = new FormData();
     formData.append('file', _file);
@@ -135,7 +134,7 @@ const uploadSingleName = function () {
 
     // 将文件上传到服务器
     instance.post('/upload_single_name', formData).then(data => {
-      if(+data.code === 200) {
+      if (+data.code === 200) {
         alert(`文件已经上传成功，您可以基于 ${data.servicePath} 访问这个资源`)
       } else {
         alert(data.msg || '文件上传失败，请您稍后再试')
