@@ -2,7 +2,7 @@
  * @Author: zhangchunjie8 zhangchunjie8@jd.com
  * @Date: 2023-01-28 15:22:54
  * @LastEditors: zhangchunjie8 zhangchunjie8@jd.com
- * @LastEditTime: 2023-01-31 10:49:57
+ * @LastEditTime: 2023-02-02 21:43:04
  */
 
 // 单一文件上传 [FORM-DATA]
@@ -54,7 +54,7 @@ const uploadSingle = function () {
 
     // 将文件上传到服务器
     instance.post('/upload_single', formData).then(data => {
-      if(+data.code === 200) {
+      if (+data.code === 200) {
         alert(`文件已经上传成功，您可以基于 ${data.servicePath} 访问这个资源`)
       } else {
         alert(data.msg || '文件上传失败，请您稍后再试')
@@ -66,7 +66,6 @@ const uploadSingle = function () {
       clearFile();
       handleBtnDisable(false);
     });
-    console.log(_file, formData);
   });
 
 
@@ -115,8 +114,6 @@ const uploadSingle = function () {
     </li>`;
 
     _file = file;
-
-    console.log(upload_inp.files);
   });
 };
 
