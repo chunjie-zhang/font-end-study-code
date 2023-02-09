@@ -2,7 +2,7 @@
  * @Author: zhangchunjie8 zhangchunjie8@jd.com
  * @Date: 2023-01-28 11:20:03
  * @LastEditors: zhangchunjie8 zhangchunjie8@jd.com
- * @LastEditTime: 2023-01-31 16:18:41
+ * @LastEditTime: 2023-02-09 16:23:27
  */
 const Controller = require('./controller');
 
@@ -40,11 +40,19 @@ const controller = new Controller();
 app.post('/upload_single', controller.uploadSingle);
 
 /**单一文件上传 [BASE64] 处理文件名称，也做文件名的去重处理*/
-app.post('/upload_single_base64', controller.uploadSingleBase64)
+app.post('/upload_single_base64', controller.uploadSingleBase64);
 
 /**单一文件上传 [缩略图] 不处理文件名称由前端传，也做文件名的匹配去重处理*/
-app.post('/upload_single_name', controller.uploadSingleName)
+app.post('/upload_single_name', controller.uploadSingleName);
 
+/**大文件分片上传 [FORM-DATA] - 上传切片 */
+app.post('/upload_chunk', controller.uploadChunk);
+
+/**大文件分片上传 [FORM-DATA] - 合并切片 */
+app.post('/upload_merge', controller.uploadMerge)
+
+/**大文件分片上传 [FORM-DATA] - 合并切片 */
+app.get('/upload_already', controller.uploadAlready)
 
 app.listen(PORT, () => {
   console.log(`服务器${HOSTNAME}正在监听中。。。。`);

@@ -2,7 +2,7 @@
  * @Author: zhangchunjie8 zhangchunjie8@jd.com
  * @Date: 2023-01-29 15:13:13
  * @LastEditors: zhangchunjie8 zhangchunjie8@jd.com
- * @LastEditTime: 2023-02-01 11:39:47
+ * @LastEditTime: 2023-02-09 17:47:44
  */
 
 const multiparty = require('multiparty'),
@@ -107,6 +107,49 @@ const multipartyUpload = function (req, auto) {
     });
   });
 };
+
+/**
+ * 合并切片文件
+ * @param {*} hashName 
+ * @param {*} count 
+ * @returns 
+ */
+const merge = function (hashName, count) {
+  return new Promise(async (resolve, reject) => {
+    let path = `${uploadDir}/${hashName}`,
+        fileList = [],
+        suffix,
+        isExists;
+    isExists = await exists(path);
+    if(!isExists) {
+      reject(`${hashName}没有找到`);
+      return;
+    }
+    // 返回一个包含“指定目录下所有文件名称”的数组对象。
+    fileList = fs.readdirSync(path);
+    // 如果文件数量少于总数
+    if (fileList.length < count) {
+      reject(`读取到${fileList.length}的文件，少于${count}`);
+      return;
+    }
+    fileList.sort((a, b) => { // 顺序排序
+      let reg = /_(\d+)/;
+      return reg.exec(a)[1] - reg.exec(b)[1];
+    }).forEach((item) => {
+      !suffix ? suffix = /\.([0-9a-zA-Z]+)$/.exec(item)[1] : null;
+      // fs.writeFileSync只会将最后一次写入的内容加入到文件中，而不是追加内容到文件，如果想要将内容追加到文件中，我们需要使用appendFile(path,data)或者appendFileSync(path,data)方法。
+      fs.appendFileSync(`${uploadDir}/${hashName}.${suffix}`, fs.readFileSync(`${path}/${item}`));
+      // 删除文件
+      fs.unlinkSync(`${path}/${item}`);
+    });
+    // 删除目录
+    fs.rmdirSync(path);
+    resolve({
+      path: `${uploadDir}/${hashName}.${suffix}`,
+      filename: `${hashName}.${suffix}`,
+    });
+  })
+}
 
 /**
  * controller层对外暴露的api处理函数
@@ -220,4 +263,97 @@ module.exports = class Controller {
     };
   };
   
+  /**
+   * 大文件分片上传 [FORM-DATA]-上传切片
+   * @param {*} req 
+   * @param {*} res 
+   */
+  async uploadChunk (req, res) {
+    try {
+      // 解析form-data
+      let { files, fields } = await multipartyUpload(req);
+      let file = (files.file && files.file[0]) || {},
+          filename = (fields.filename && fields.filename) || '',
+          path = '',
+          isExists = false;
+
+      // 创建存放切片的临时文件目录
+      let [, hashName] = /^([^_]+)_(\d+)/.exec(filename);
+      path = `${uploadDir}/${hashName}`; // 用hash生成一个临时文件夹
+      !fs.existsSync(path) ? fs.mkdirSync(path) : null;
+
+      // 将切片放置到临时的目录中
+      path = `${uploadDir}/${hashName}/${filename}`;
+      // 判断是否存在该文件
+      isExists = await exists(path);
+      if (isExists) {
+        res.send({
+          code: 200,
+          msg: '文件已存在',
+          originalFilename: filename,
+          servicePath: path.replace(__dirname, HOSTNAME),
+        });
+        return;
+      }
+      // 写入文件
+      writeFile(res, path, file, filename, true);
+    } catch (error) {
+      res.send({
+        code: 404,
+        msg: error
+      });
+    }
+  }
+
+  /**
+   * 大文件分片上传 [FORM-DATA]-合并切片
+   * @param {*} req 
+   * @param {*} req 
+   * @param {*} res 
+   */
+  async uploadMerge (req, res) {
+    let {hashName, count} = req.body;
+    try {
+      let {filename, path} = await merge(hashName, count);
+      res.send({
+        code: 200,
+        originalFilename: filename,
+        servicePath: path.replace(__dirname, HOSTNAME),
+      });
+    } catch (error) {
+      res.send({
+        code: 404,
+        msg: error,
+      });
+    }
+  }
+
+  /**
+   * 大文件分片上传 [FORM-DATA]-读取临时存储的切片
+   * @param {*} req 
+   * @param {*} res 
+   */
+  async uploadAlready (req, res) {
+    let { hashName } = req.query;
+    let path = `${uploadDir}/${hashName}`,
+        fileList = [];
+    try {
+      fileList = fs.readdirSync(path);
+      fileList = fileList.sort((a, b) => {
+        let reg = /_(\d+)/;
+        return reg.exec(a)[1] - reg.exec(b)[1];
+      });
+
+      res.send({
+        code: 200,
+        msg: '',
+        fileList,
+      });
+    } catch (error) {
+      res.send({
+        code: 404,
+        fileList,
+      });
+    }
+  }
 };

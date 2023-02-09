@@ -2,7 +2,7 @@
  * @Author: zhangchunjie8 zhangchunjie8@jd.com
  * @Date: 2023-01-31 16:10:22
  * @LastEditors: zhangchunjie8 zhangchunjie8@jd.com
- * @LastEditTime: 2023-01-31 21:02:49
+ * @LastEditTime: 2023-02-05 17:03:33
  */
 
 // 单一文件上传 [进度条管控]
@@ -12,29 +12,6 @@ const uploadProcess = function () {
     upload_button_select = upload.querySelector('.upload_button.select'),
     upload_process = upload.querySelector('.upload_progress'),
     upload_progress_line = upload_process.querySelector('.progress');
-
-  /**
-   * 是否是处于可操作状态
-   * @param {*} element 
-   * @returns 
-   */
-  const checkIsDisabled = element => {
-    return (element.classList.contains('loading'));
-  }
-
-  /**
-  * 控制按钮的状态
-  * @param {*} flag true 为不可选，false可选
-  */
-  const handleBtnDisable = function (flag) {
-    if (flag) {
-      upload_button_select.classList.add('disabled');
-      upload_button_upload.classList.add('loading');
-      return;
-    }
-    upload_button_select.classList.remove('disabled');
-    upload_button_upload.classList.remove('loading');
-  }
 
   // 点击选择文件按钮，触发上传文件input框选文件的行为
   upload_button_select.addEventListener('click', function () {
